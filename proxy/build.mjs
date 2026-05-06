@@ -2,11 +2,14 @@
 
 import { build } from 'esbuild';
 import { mkdir } from 'node:fs/promises';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 
 // 读取 .env 文件中的环境变量
 function loadEnvFile() {
   try {
+    if (!existsSync(new URL('./.env', import.meta.url))) {
+      return {};
+    }
     const envPath = new URL('./.env', import.meta.url);
     const content = readFileSync(envPath, 'utf-8');
     const env = {};
@@ -22,7 +25,15 @@ function loadEnvFile() {
   }
 }
 
-const envVars = loadEnvFile();
+// 优先使用 process.env（阿里云 ESA 构建环境变量），其次使用 .env 文件
+const envFromFile = loadEnvFile();
+const envVars = {
+  LLM_API_KEY: process.env.LLM_API_KEY || envFromFile.LLM_API_KEY || '',
+  LLM_BASE_URL: process.env.LLM_BASE_URL || envFromFile.LLM_BASE_URL || 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+  LLM_MODEL: process.env.LLM_MODEL || envFromFile.LLM_MODEL || 'qwen-plus',
+  KV_NAMESPACE: process.env.KV_NAMESPACE || envFromFile.KV_NAMESPACE || 'wenxu-kv',
+  APP_ORIGIN: process.env.APP_ORIGIN || envFromFile.APP_ORIGIN || '',
+};
 
 await mkdir(new URL('./dist', import.meta.url), { recursive: true });
 
