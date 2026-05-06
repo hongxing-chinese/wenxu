@@ -35,8 +35,14 @@ const envVars = {
   APP_ORIGIN: process.env.APP_ORIGIN || envFromFile.APP_ORIGIN || '',
 };
 
+console.log('构建环境变量:');
+console.log('  LLM_BASE_URL:', envVars.LLM_BASE_URL);
+console.log('  LLM_MODEL:', envVars.LLM_MODEL);
+console.log('  LLM_API_KEY:', envVars.LLM_API_KEY ? '(已设置)' : '(未设置)');
+
 await mkdir(new URL('./dist', import.meta.url), { recursive: true });
 
+// 直接定义全局常量，而不是使用 process.env
 await build({
   entryPoints: ['./proxy/src/index.ts'],
   bundle: true,
@@ -49,17 +55,14 @@ await build({
   legalComments: 'none',
   define: {
     'process.env.NODE_ENV': '"production"',
-    // 通过 define 注入环境变量（构建时替换）
-    'process.env.LLM_API_KEY': JSON.stringify(envVars.LLM_API_KEY || ''),
-    'process.env.LLM_BASE_URL': JSON.stringify(envVars.LLM_BASE_URL || 'https://dashscope.aliyuncs.com/compatible-mode/v1'),
-    'process.env.LLM_MODEL': JSON.stringify(envVars.LLM_MODEL || 'qwen-plus'),
-    'process.env.KV_NAMESPACE': JSON.stringify(envVars.KV_NAMESPACE || 'wenxu-kv'),
-    'process.env.APP_ORIGIN': JSON.stringify(envVars.APP_ORIGIN || ''),
+    // 直接替换为常量值
+    'ENV_LLM_API_KEY': JSON.stringify(envVars.LLM_API_KEY),
+    'ENV_LLM_BASE_URL': JSON.stringify(envVars.LLM_BASE_URL),
+    'ENV_LLM_MODEL': JSON.stringify(envVars.LLM_MODEL),
+    'ENV_KV_NAMESPACE': JSON.stringify(envVars.KV_NAMESPACE),
+    'ENV_APP_ORIGIN': JSON.stringify(envVars.APP_ORIGIN),
   },
   external: [],
 });
 
 console.log('✓ proxy/dist/index.js built successfully');
-console.log('  LLM_BASE_URL:', envVars.LLM_BASE_URL || '(未设置，使用默认)');
-console.log('  LLM_MODEL:', envVars.LLM_MODEL || '(未设置，使用默认)');
-console.log('  LLM_API_KEY:', envVars.LLM_API_KEY ? '(已设置)' : '(未设置)');

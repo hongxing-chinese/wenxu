@@ -3,23 +3,14 @@
  * 接收前端排盘数据，后端组装提示词，流式转发大模型 API 响应
  * 基于 IP 的每日免费额度限制
  *
- * 环境变量支持：
- * - Cloudflare Workers: 通过 env 参数传递
- * - 阿里云 ESA: 通过 process.env 传递
+ * 环境变量通过 esbuild define 注入为常量
  */
 
-// 类型声明：process.env 环境变量
-declare global {
-  namespace NodeJS {
-    interface ProcessEnv {
-      LLM_API_KEY?: string;
-      LLM_BASE_URL?: string;
-      LLM_MODEL?: string;
-      KV_NAMESPACE?: string;
-      APP_ORIGIN?: string;
-    }
-  }
-}
+// 定义全局常量（由 esbuild 在构建时注入）
+declare const ENV_LLM_API_KEY: string;
+declare const ENV_LLM_BASE_URL: string;
+declare const ENV_LLM_MODEL: string;
+declare const ENV_KV_NAMESPACE: string;
 
 declare class EdgeKV {
   constructor(config: { namespace: string });
@@ -46,23 +37,31 @@ const DAILY_FREE_LIMIT = 5;
 
 /**
  * 获取环境变量
- * 优先从 env 参数获取（Cloudflare Workers），如果不存在则从 process.env 获取（阿里云 ESA）
+ * 优先从 env 参数获取（Cloudflare Workers），其次使用构建时注入的常量（阿里云 ESA）
  */
-function getEnvVar<T extends keyof Env>(
+function getEnvVar(
   env: Record<string, string>,
-  key: T,
-  defaultValue?: string,
+  key: 'KV_NAMESPACE' | 'LLM_API_KEY' | 'LLM_BASE_URL' | 'LLM_MODEL',
+  defaultValue: string,
 ): string {
-  // 优先从 env 参数获取
+  // 优先从 env 参数获取（Cloudflare Workers）
   if (env && env[key]) {
     return env[key];
   }
-  // 回退到 process.env
-  if (typeof process !== 'undefined' && process.env && process.env[key]) {
-    return process.env[key] as string;
+
+  // 回退到构建时注入的常量（阿里云 ESA）
+  switch (key) {
+    case 'KV_NAMESPACE':
+      return typeof ENV_KV_NAMESPACE !== 'undefined' ? ENV_KV_NAMESPACE : defaultValue;
+    case 'LLM_API_KEY':
+      return typeof ENV_LLM_API_KEY !== 'undefined' ? ENV_LLM_API_KEY : defaultValue;
+    case 'LLM_BASE_URL':
+      return typeof ENV_LLM_BASE_URL !== 'undefined' ? ENV_LLM_BASE_URL : defaultValue;
+    case 'LLM_MODEL':
+      return typeof ENV_LLM_MODEL !== 'undefined' ? ENV_LLM_MODEL : defaultValue;
+    default:
+      return defaultValue;
   }
-  // 使用默认值
-  return defaultValue || '';
 }
 
 function getClientIp(request: Request): string {

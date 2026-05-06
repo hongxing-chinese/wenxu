@@ -2,19 +2,11 @@
  * 历史记录路由
  * 基于 Edge KV 的历史排盘记录 CRUD（按 IP 隔离）
  *
- * 环境变量支持：
- * - Cloudflare Workers: 通过 env 参数传递
- * - 阿里云 ESA: 通过 process.env 传递
+ * 环境变量通过 esbuild define 注入为常量
  */
 
-// 类型声明：process.env 环境变量
-declare global {
-  namespace NodeJS {
-    interface ProcessEnv {
-      KV_NAMESPACE?: string;
-    }
-  }
-}
+// 定义全局常量（由 esbuild 在构建时注入）
+declare const ENV_KV_NAMESPACE: string;
 
 declare class EdgeKV {
   constructor(config: { namespace: string });
@@ -38,23 +30,24 @@ interface Env {
 
 /**
  * 获取环境变量
- * 优先从 env 参数获取（Cloudflare Workers），如果不存在则从 process.env 获取（阿里云 ESA）
+ * 优先从 env 参数获取（Cloudflare Workers），其次使用构建时注入的常量（阿里云 ESA）
  */
-function getEnvVar<T extends keyof Env>(
+function getEnvVar(
   env: Record<string, string>,
-  key: T,
-  defaultValue?: string,
+  key: 'KV_NAMESPACE',
+  defaultValue: string,
 ): string {
-  // 优先从 env 参数获取
+  // 优先从 env 参数获取（Cloudflare Workers）
   if (env && env[key]) {
     return env[key];
   }
-  // 回退到 process.env
-  if (typeof process !== 'undefined' && process.env && process.env[key]) {
-    return process.env[key] as string;
+
+  // 回退到构建时注入的常量（阿里云 ESA）
+  if (typeof ENV_KV_NAMESPACE !== 'undefined') {
+    return ENV_KV_NAMESPACE;
   }
-  // 使用默认值
-  return defaultValue || '';
+
+  return defaultValue;
 }
 
 function getClientIp(request: Request): string {
