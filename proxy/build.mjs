@@ -2,6 +2,27 @@
 
 import { build } from 'esbuild';
 import { mkdir } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
+
+// 读取 .env 文件中的环境变量
+function loadEnvFile() {
+  try {
+    const envPath = new URL('./.env', import.meta.url);
+    const content = readFileSync(envPath, 'utf-8');
+    const env: Record<string, string> = {};
+    content.split('\n').forEach((line) => {
+      const match = line.match(/^([^#=]+)=(.*)$/);
+      if (match) {
+        env[match[1].trim()] = match[2].trim();
+      }
+    });
+    return env;
+  } catch {
+    return {};
+  }
+}
+
+const envVars = loadEnvFile();
 
 await mkdir(new URL('./dist', import.meta.url), { recursive: true });
 
@@ -17,9 +38,17 @@ await build({
   legalComments: 'none',
   define: {
     'process.env.NODE_ENV': '"production"',
-    // 保留 process.env，不进行替换，让运行时读取实际环境变量
+    // 通过 define 注入环境变量（构建时替换）
+    'process.env.LLM_API_KEY': JSON.stringify(envVars.LLM_API_KEY || ''),
+    'process.env.LLM_BASE_URL': JSON.stringify(envVars.LLM_BASE_URL || 'https://dashscope.aliyuncs.com/compatible-mode/v1'),
+    'process.env.LLM_MODEL': JSON.stringify(envVars.LLM_MODEL || 'qwen-plus'),
+    'process.env.KV_NAMESPACE': JSON.stringify(envVars.KV_NAMESPACE || 'wenxu-kv'),
+    'process.env.APP_ORIGIN': JSON.stringify(envVars.APP_ORIGIN || ''),
   },
   external: [],
 });
 
 console.log('✓ proxy/dist/index.js built successfully');
+console.log('  LLM_BASE_URL:', envVars.LLM_BASE_URL || '(未设置，使用默认)');
+console.log('  LLM_MODEL:', envVars.LLM_MODEL || '(未设置，使用默认)');
+console.log('  LLM_API_KEY:', envVars.LLM_API_KEY ? '(已设置)' : '(未设置)');

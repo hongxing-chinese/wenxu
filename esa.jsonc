@@ -1,12 +1,15 @@
 {
   // ESA Pages 部署配置
   // 文档: https://help.aliyun.com/zh/edge-security-acceleration/
-    "name": "wenxu-app",
-    "entry": "./proxy/dist/index.js",
-    "installCommand": "npm install",
-    "buildCommand": "npm run build:all",
-    "assets": {
-      "directory": "./dist",
-      "notFoundStrategy": "singlePageApplication"
-    }
-  }
+  "name": "wenxu-app",
+  "entry": "./proxy/dist/index.js",
+  "installCommand": "npm install",
+  "buildCommand": "npm run build:all",
+  "assets": {
+    "directory": "./dist",
+    "notFoundStrategy": "singlePageApplication"
+  },
+  // 注意：ESA 边缘函数的路由需要在控制台手动配置
+  // 路由规则: wenxu.wideseek.de/api/* -> 边缘函数
+  // 部署后请在 ESA 控制台 → 边缘函数 → 触发器 → 路由 → 添加路由
+}
