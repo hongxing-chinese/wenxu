@@ -1,0 +1,12 @@
+{
+  // ESA Pages 部署配置
+  // 文档: https://help.aliyun.com/zh/edge-security-acceleration/
+    "name": "wenxu-app",
+    "entry": "./proxy/dist/index.js",
+    "installCommand": "npm install",
+    "buildCommand": "npm run build:all",
+    "assets": {
+      "directory": "./dist",
+      "notFoundStrategy": "singlePageApplication"
+    }
+  }

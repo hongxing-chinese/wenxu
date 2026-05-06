@@ -1,0 +1,25 @@
+{
+  "name": "问虚",
+  "short_name": "问虚",
+  "description": "八字命理、紫微斗数、六爻卜卦等 AI 提示词生成与分析工具。",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fffdfd",
+  "theme_color": "#fbf0f7",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
