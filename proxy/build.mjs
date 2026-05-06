@@ -9,7 +9,7 @@ function loadEnvFile() {
   try {
     const envPath = new URL('./.env', import.meta.url);
     const content = readFileSync(envPath, 'utf-8');
-    const env: Record<string, string> = {};
+    const env = {};
     content.split('\n').forEach((line) => {
       const match = line.match(/^([^#=]+)=(.*)$/);
       if (match) {
