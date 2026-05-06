@@ -116,7 +116,7 @@ export function WelcomePage() {
           <div className="welcome-about-card" id="about-us" style={{ flex: '1 1 300px', backgroundColor: '#fff', padding: '2rem', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem', color: '#111' }}>关于我们</h2>
             <div style={{ fontSize: '0.9rem', color: '#666', lineHeight: '1.6' }}>
-              <p>八字、紫薇、风水、六壬、六爻，这些中国传统术数神秘而智慧，本站是 WideSeek 项目组构建的基于国产前沿 AI 大模型及算法测试的免费网站，内容由 AI 生成，本站为每位用户每天提供5次免费测试计划，仅供娱乐参考。如果项目对你有帮助，可以将网站分享出去。</p>
+              <p>八字、紫薇、风水、六壬、六爻，这些中国传统术数神秘而智慧，本站是 WideSeek 项目组构建的基于国产前沿 AI 大模型及算法测试的免费网站，内容由 AI 生成，本站为每位用户每天提供15次免费测试计划，仅供娱乐参考。如果项目对你有帮助，可以将网站分享出去。</p>
               
               <h3 style={{ color: '#333', fontWeight: 'bold', marginTop: '1.5rem', marginBottom: '0.5rem' }}>免责声明</h3>
               <p>切记，AI 算命仅供娱乐。生成的内容完全基于 AI 模型的推理，不构成任何形式的建议......祝您好运！</p>

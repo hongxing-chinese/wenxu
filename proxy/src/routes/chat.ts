@@ -33,7 +33,7 @@ interface ChatRequest {
   stream?: boolean;
 }
 
-const DAILY_FREE_LIMIT = 5;
+const DAILY_FREE_LIMIT = 15;
 
 /**
  * 获取环境变量
@@ -120,7 +120,7 @@ export async function handleChatRoutes(
 
     if (!rateResult.allowed) {
       return ctx.json({
-        error: '今日免费额度已用完（每天5次）',
+        error: '今日免费额度已用完（每天15次）',
         code: 'RATE_LIMITED',
       }, 429);
     }
